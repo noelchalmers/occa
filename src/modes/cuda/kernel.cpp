@@ -42,7 +42,7 @@ namespace occa {
     }
 
     dim kernel::maxOuterDims() const {
-      return dim(-1, -1, -1);
+      return dim(static_cast<udim_t>(-1), static_cast<udim_t>(-1), static_cast<udim_t>(-1));
     }
 
     dim kernel::maxInnerDims() const {

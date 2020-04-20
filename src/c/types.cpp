@@ -646,7 +646,7 @@ const int OCCA_PROPERTIES    = occa::c::typeType::properties;
 const occaType occaUndefined  = occa::c::undefinedOccaType();
 const occaType occaDefault    = occa::c::defaultOccaType();
 const occaType occaNull       = occa::c::nullOccaType();
-const occaUDim_t occaAllBytes = -1;
+const occaUDim_t occaAllBytes = static_cast<occaUDim_t>(-1);
 //======================================
 
 //-----[ Known Types ]------------------
