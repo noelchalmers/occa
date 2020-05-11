@@ -29,6 +29,8 @@ option(ALLOW_METAL "Allow Metal" OFF)
 option(ALLOW_HIP "Allow HIP" OFF)
 #option(ALLOW_ONEAPI "Allow OneAPI" OFF)
 option(ENABLE_TESTS "Enable tests" OFF)
+option(ENABLE_EXAMPLES "Build simple examples" OFF)
+option(BUILD_UTILITY "Build occa utility binary" OFF)
 
 find_package(Threads REQUIRED)
 
@@ -58,18 +60,12 @@ if (ALLOW_METAL)
   include(Metal)
 endif()
 
-
-add_definitions(-DUSE_CMAKE)
-
 include(SetCompilerFlags)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if (ALLOW_OPENMP)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-include_directories(${PROJECT_BINARY_DIR}/include)
 set(OCCA_BUILD_DIR ${PROJECT_BINARY_DIR})
 configure_file(scripts/compiledDefinesTemplate.hpp.in ${PROJECT_BINARY_DIR}/include/occa/defines/compiledDefines.hpp)
 install(FILES ${PROJECT_BINARY_DIR}/include/occa/defines/compiledDefines.hpp DESTINATION include/occa/defines)
@@ -78,9 +74,57 @@ if (ENABLE_TESTS)
   include(CTest)
 endif()
 
-add_subdirectory(src)
-add_subdirectory(bin)
-add_subdirectory(examples)
+file(GLOB_RECURSE sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
+list(REMOVE_ITEM sources src/core/kernelOperators.cpp src/tools/runFunction.cpp)
+
+if (WITH_METAL)
+  file(GLOB_RECURSE sources_metal RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.mm")
+  set(sources ${sources} ${sources_metal})
+endif()
+
+add_library(libocca SHARED ${sources})
+
+# Without this, CMake will create liblibocca.so
+set_target_properties(libocca PROPERTIES OUTPUT_NAME occa LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+set(LIBOCCA_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+
+if (WITH_CUDA)
+  set(LIBOCCA_LIBRARIES ${CUDA_LIBRARIES} ${LIBOCCA_LIBRARIES})
+endif()
+
+if (WITH_HIP)
+  set(LIBOCCA_LIBRARIES ${HIP_LIBRARIES} ${LIBOCCA_LIBRARIES})
+endif()
+
+if (WITH_OPENCL)
+  set(LIBOCCA_LIBRARIES ${OpenCL_LIBRARIES} ${LIBOCCA_LIBRARIES})
+endif()
+
+if (WITH_MPI)
+  set(LIBOCCA_LIBRARIES ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} ${LIBOCCA_LIBRARIES})
+endif()
+
+if (WITH_METAL)
+  set(LIBOCCA_LIBRARIES ${METAL_LIBRARY} ${CORE_SERVICES} ${APP_KIT} ${LIBOCCA_LIBRARIES})
+endif()
+
+target_link_libraries(libocca ${LIBOCCA_LIBRARIES})
+
+target_include_directories(libocca PUBLIC
+                          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+target_compile_definitions(libocca PRIVATE -DUSE_CMAKE)
+
+install(TARGETS libocca DESTINATION lib)
+
+if (BUILD_UTILITY)
+  add_subdirectory(bin)
+endif()
+
+if (ENABLE_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 if (ENABLE_TESTS)
   add_subdirectory(tests)
