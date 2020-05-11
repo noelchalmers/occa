@@ -397,6 +397,8 @@ namespace occa {
       OCCA_HIP_ERROR("Device: malloc",
                      hipMalloc((void**) &(mem.hipPtr), bytes));
 
+      mem.ptr = (char*)mem.hipPtr;
+
       if (src != NULL) {
         mem.copyFrom(src, bytes, 0);
       }
