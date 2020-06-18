@@ -1,6 +1,3 @@
-# Git
-.gitattributes
-
 # Build artifacts
 *.obj
 *.pyc
