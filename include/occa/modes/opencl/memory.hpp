@@ -25,7 +25,6 @@ namespace occa {
       dim_t rootOffset;
 
       cl_mem clMem;
-      void *mappedPtr;
 
     public:
       memory(modeDevice_t *modeDevice_,
@@ -39,7 +38,7 @@ namespace occa {
 
       modeMemory_t* addOffset(const dim_t offset);
 
-      void* getPtr(const occa::properties &props);
+      void* getPtr();
 
       void copyTo(void *dest,
                   const udim_t bytes,

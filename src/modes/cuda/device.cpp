@@ -425,9 +425,7 @@ namespace occa {
     modeMemory_t* device::malloc(const udim_t bytes,
                                  const void *src,
                                  const occa::properties &props) {
-      if (props.get("mapped", false)) {
-        return mappedAlloc(bytes, src, props);
-      }
+
       if (props.get("unified", false)) {
         return unifiedAlloc(bytes, src, props);
       }
@@ -446,7 +444,7 @@ namespace occa {
       return &mem;
     }
 
-    modeMemory_t* device::mappedAlloc(const udim_t bytes,
+    modeMemory_t* device::hostMalloc(const udim_t bytes,
                                       const void *src,
                                       const occa::properties &props) {
 
@@ -455,15 +453,17 @@ namespace occa {
       OCCA_CUDA_ERROR("Device: Setting Context",
                       cuCtxSetCurrent(cuContext));
       OCCA_CUDA_ERROR("Device: malloc host",
-                      cuMemAllocHost((void**) &(mem.mappedPtr), bytes));
+                      cuMemAllocHost((void**) &(mem.ptr), bytes));
       OCCA_CUDA_ERROR("Device: get device pointer from host",
                       cuMemHostGetDevicePointer(&(mem.cuPtr),
-                                                mem.mappedPtr,
+                                                mem.ptr,
                                                 0));
 
       if (src != NULL) {
-        ::memcpy(mem.mappedPtr, src, bytes);
+        ::memcpy(mem.ptr, src, bytes);
       }
+      mem.useHostPtr = true;
+
       return &mem;
     }
 

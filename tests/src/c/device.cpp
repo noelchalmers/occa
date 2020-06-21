@@ -108,7 +108,7 @@ void testMemoryMethods() {
   ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
             allocatedBytes);
 
-  // Test malloc + umalloc
+  // Test malloc, hostMalloc, & umalloc
   occaMemory mem1 = occaDeviceMalloc(device, memBytes, NULL, occaDefault);
   allocatedBytes += memBytes;
 
@@ -116,6 +116,18 @@ void testMemoryMethods() {
             allocatedBytes);
 
   occaMemory mem2 = occaDeviceMalloc(device, memBytes, NULL, props);
+  allocatedBytes += memBytes;
+
+  ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
+            allocatedBytes);
+
+  occaMemory mem3 = occaDeviceHostMalloc(device, memBytes, NULL, occaDefault);
+  allocatedBytes += memBytes;
+
+  ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
+            allocatedBytes);
+
+  occaMemory mem4 = occaDeviceHostMalloc(device, memBytes, NULL, props);
   allocatedBytes += memBytes;
 
   ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
@@ -141,6 +153,18 @@ void testMemoryMethods() {
             allocatedBytes);
 
   occaFree(&mem2);
+  allocatedBytes -= memBytes;
+
+  ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
+            allocatedBytes);
+
+  occaFree(&mem3);
+  allocatedBytes -= memBytes;
+
+  ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),
+            allocatedBytes);
+
+  occaFree(&mem4);
   allocatedBytes -= memBytes;
 
   ASSERT_EQ((size_t) occaDeviceMemoryAllocated(device),

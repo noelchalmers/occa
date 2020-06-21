@@ -65,6 +65,15 @@ OCCA_LFUNC occaMemory OCCA_RFUNC occaTypedMalloc(const occaUDim_t entries,
                                                  const void *src,
                                                  occaProperties props);
 
+OCCA_LFUNC occaMemory OCCA_RFUNC occaHostMalloc(const occaUDim_t bytes,
+                                            const void *src,
+                                            occaProperties props);
+
+OCCA_LFUNC occaMemory OCCA_RFUNC occaTypedHostMalloc(const occaUDim_t entries,
+                                                 const occaDtype type,
+                                                 const void *src,
+                                                 occaProperties props);
+
 OCCA_LFUNC void* OCCA_RFUNC occaUMalloc(const occaUDim_t bytes,
                                         const void *src,
                                         occaProperties props);

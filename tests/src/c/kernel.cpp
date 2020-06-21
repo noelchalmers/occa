@@ -106,6 +106,9 @@ void testRun() {
 
   int value = 1;
   occaMemory mem = occaMalloc(1 * sizeof(int), &value, occaDefault);
+
+  occaMemory mem2 = occaHostMalloc(1 * sizeof(int), &value, occaDefault);
+
   value = 2;
   int *uvaPtr = (int*) occaUMalloc(1 * sizeof(int), &value, occaDefault);
 
@@ -117,6 +120,7 @@ void testRun() {
     argKernel, 15,
     occaNull,
     mem,
+    mem2,
     occaPtr(uvaPtr),
     occaInt8(3),
     occaUInt8(4),
@@ -136,6 +140,7 @@ void testRun() {
   occaKernelClearArgs(argKernel);
   occaKernelPushArg(argKernel, occaNull);
   occaKernelPushArg(argKernel, mem);
+  occaKernelPushArg(argKernel, mem2);
   occaKernelPushArg(argKernel, occaPtr(uvaPtr));
   occaKernelPushArg(argKernel, occaInt8(3));
   occaKernelPushArg(argKernel, occaUInt8(4));

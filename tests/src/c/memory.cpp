@@ -42,12 +42,12 @@ void testInit() {
             OCCA_MEMORY);
   ASSERT_TRUE(occaMemoryIsInitialized(mem));
 
-  int *ptr = (int*) occaMemoryPtr(mem, occaDefault);
+  int *ptr = (int*) occaMemoryPtr(mem);
   ASSERT_EQ(ptr[0], 0);
   ASSERT_EQ(ptr[1], 1);
   ASSERT_EQ(ptr[2], 2);
 
-  int *ptr2 = (int*) occaMemoryPtr(mem, props);
+  int *ptr2 = (int*) occaMemoryPtr(mem);
   ASSERT_EQ(ptr, ptr2);
 
   ASSERT_EQ(occa::c::device(occaMemoryGetDevice(mem)),
@@ -68,7 +68,7 @@ void testInit() {
   ASSERT_EQ((size_t) occaMemorySize(subMem),
             bytes - (1 * sizeof(int)));
 
-  ptr = (int*) occaMemoryPtr(subMem, occaDefault);
+  ptr = (int*) occaMemoryPtr(subMem);
   ASSERT_EQ(ptr[0], 1);
   ASSERT_EQ(ptr[1], 2);
 
@@ -140,8 +140,8 @@ void testCopyMethods() {
     occaCreatePropertiesFromString("foo: 'bar'")
   );
 
-  int *ptr2 = (int*) occaMemoryPtr(mem2, occaDefault);
-  int *ptr4 = (int*) occaMemoryPtr(mem4, occaDefault);
+  int *ptr2 = (int*) occaMemoryPtr(mem2);
+  int *ptr4 = (int*) occaMemoryPtr(mem4);
 
   // Mem -> Mem
   // Copy over [2, 3]
@@ -244,7 +244,7 @@ void testInteropMethods() {
   ASSERT_NEQ(occa::c::memory(mem1),
              occa::c::memory(mem2));
 
-  int *ptr = (int*) occaMemoryPtr(mem2, occaDefault);
+  int *ptr = (int*) occaMemoryPtr(mem2);
   occaMemoryDetach(mem2);
 
   for (int i = 0; i < entries; ++i) {

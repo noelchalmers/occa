@@ -262,6 +262,20 @@ namespace occa {
       return mem;
     }
 
+    modeMemory_t* device::hostMalloc(const udim_t bytes,
+                                 const void *src,
+                                 const occa::properties &props) {
+      metal::memory *mem = new metal::memory(this, bytes, props);
+
+      mem->ptr = (char*) sys::malloc(bytes);
+      if (src != NULL) {
+        ::memcpy(mem->ptr, src, bytes);
+      }
+      mem->useHostPtr = true;
+
+      return mem;
+    }
+
     udim_t device::memorySize() const {
       return metalDevice.getMemorySize();
     }

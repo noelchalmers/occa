@@ -19,7 +19,8 @@ namespace occa {
     modeDevice(modeDevice_),
     dtype_(&dtype::byte),
     size(size_),
-    isOrigin(true) {
+    isOrigin(true),
+    useHostPtr(false) {
     modeDevice->addMemoryRef(this);
   }
 
@@ -36,7 +37,7 @@ namespace occa {
     }
   }
 
-  void* modeMemory_t::getPtr(const occa::properties &props) {
+  void* modeMemory_t::getPtr() {
     return ptr;
   }
 
@@ -148,28 +149,14 @@ namespace occa {
   template <>
   void* memory::ptr<void>() {
     return (modeMemory
-            ? modeMemory->ptr
+            ? modeMemory->getPtr()
             : NULL);
   }
 
   template <>
   const void* memory::ptr<void>() const {
     return (modeMemory
-            ? modeMemory->ptr
-            : NULL);
-  }
-
-  template <>
-  void* memory::ptr<void>(const occa::properties &props) {
-    return (modeMemory
-            ? modeMemory->getPtr(props)
-            : NULL);
-  }
-
-  template <>
-  const void* memory::ptr<void>(const occa::properties &props) const {
-    return (modeMemory
-            ? modeMemory->getPtr(props)
+            ? modeMemory->getPtr()
             : NULL);
   }
 
@@ -540,9 +527,14 @@ namespace occa {
 
   occa::memory memory::clone() const {
     if (modeMemory) {
-      return occa::device(modeMemory->modeDevice).malloc(size(),
-                                                         *this,
-                                                         properties());
+      if (modeMemory->useHostPtr)
+        return occa::device(modeMemory->modeDevice).hostMalloc(size(),
+                                                           *this,
+                                                           properties());
+      else
+        return occa::device(modeMemory->modeDevice).malloc(size(),
+                                                           *this,
+                                                           properties());
     }
     return occa::memory();
   }

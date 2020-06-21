@@ -32,8 +32,13 @@ namespace occa {
       memory *m = new memory(modeDevice,
                              size - offset,
                              properties);
-      m->metalBuffer = metalBuffer;
-      m->bufferOffset = bufferOffset + offset;
+      if (useHostPtr) {
+        m->ptr = ptr + offset;
+      } else {
+        m->metalBuffer = metalBuffer;
+        m->bufferOffset = bufferOffset + offset;
+      }
+      m->useHostPtr = useHostPtr;
       return m;
     }
 
@@ -41,7 +46,7 @@ namespace occa {
       return metalBuffer;
     }
 
-    void* memory::getPtr(const occa::properties &props) {
+    void* memory::getPtr() {
       if (!ptr) {
         ptr = (char*) metalBuffer.getPtr();
       }
@@ -58,14 +63,18 @@ namespace occa {
                           const occa::properties &props) {
       const bool async = props.get("async", false);
 
-      api::metal::commandQueue_t &metalCommandQueue = (
-        ((metal::device*) modeDevice)->metalCommandQueue
-      );
-      metalCommandQueue.memcpy(metalBuffer,
-                               offset,
-                               src,
-                               bytes,
-                               async);
+      if (useHostPtr) {
+        ::memcpy(ptr+offset, src, bytes);
+      } else {
+        api::metal::commandQueue_t &metalCommandQueue = (
+          ((metal::device*) modeDevice)->metalCommandQueue
+        );
+        metalCommandQueue.memcpy(metalBuffer,
+                                 offset,
+                                 src,
+                                 bytes,
+                                 async);
+      }
     }
 
     void memory::copyFrom(const modeMemory_t *src,
@@ -78,12 +87,29 @@ namespace occa {
       api::metal::commandQueue_t &metalCommandQueue = (
         ((metal::device*) modeDevice)->metalCommandQueue
       );
-      metalCommandQueue.memcpy(metalBuffer,
+
+      if (useHostPtr && src->useHostPtr) {
+        ::memcpy(ptr + destOffset, src->ptr + srcOffset, bytes);
+      } else if (src->useHostPtr) {
+        metalCommandQueue.memcpy(metalBuffer,
                                destOffset,
+                               src->ptr + srcOffset,
+                               bytes,
+                               async);
+      } else if (useHostPtr) {
+        metalCommandQueue.memcpy(ptr + destOffset,
                                ((const metal::memory*) src)->metalBuffer,
                                srcOffset,
                                bytes,
                                async);
+      } else {
+        metalCommandQueue.memcpy(metalBuffer,
+                                 destOffset,
+                                 ((const metal::memory*) src)->metalBuffer,
+                                 srcOffset,
+                                 bytes,
+                                 async);
+      }
     }
 
     void memory::copyTo(void *dest,
@@ -93,14 +119,18 @@ namespace occa {
 
       const bool async = props.get("async", false);
 
-      api::metal::commandQueue_t &metalCommandQueue = (
-        ((metal::device*) modeDevice)->metalCommandQueue
-      );
-      metalCommandQueue.memcpy(dest,
-                               metalBuffer,
-                               offset,
-                               bytes,
-                               async);
+      if (useHostPtr) {
+        ::memcpy(dest, ptr+offset, bytes);
+      } else {
+        api::metal::commandQueue_t &metalCommandQueue = (
+          ((metal::device*) modeDevice)->metalCommandQueue
+        );
+        metalCommandQueue.memcpy(dest,
+                                 metalBuffer,
+                                 offset,
+                                 bytes,
+                                 async);
+      }
     }
 
     void memory::detach() {

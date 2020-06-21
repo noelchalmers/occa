@@ -41,6 +41,7 @@ namespace occa {
     const dtype_t *dtype_;
     udim_t size;
     bool isOrigin;
+    bool useHostPtr;
 
     modeMemory_t(modeDevice_t *modeDevice_,
                  udim_t size_,
@@ -62,7 +63,7 @@ namespace occa {
 
     virtual modeMemory_t* addOffset(const dim_t offset) = 0;
 
-    virtual void* getPtr(const occa::properties &props);
+    virtual void* getPtr();
 
     virtual void copyTo(void *dest,
                         const udim_t bytes,
@@ -142,12 +143,6 @@ namespace occa {
 
     template <class TM = void>
     const TM* ptr() const;
-
-    template <class TM = void>
-    TM* ptr(const occa::properties &props);
-
-    template <class TM = void>
-    const TM* ptr(const occa::properties &props) const;
 
     modeMemory_t* getModeMemory() const;
     modeDevice_t* getModeDevice() const;
@@ -258,12 +253,6 @@ namespace occa {
 
   template <>
   const void* memory::ptr<void>() const;
-
-  template <>
-  void* memory::ptr<void>(const occa::properties &props);
-
-  template <>
-  const void* memory::ptr<void>(const occa::properties &props) const;
 }
 
 #include "memory.tpp"

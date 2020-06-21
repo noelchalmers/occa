@@ -66,6 +66,10 @@ namespace occa {
                                    const void *src,
                                    const occa::properties &props);
 
+      virtual modeMemory_t* hostMalloc(const udim_t bytes,
+                                   const void *src,
+                                   const occa::properties &props);
+
       virtual udim_t memorySize() const;
       //================================
     };

@@ -7,13 +7,8 @@ bool OCCA_RFUNC occaMemoryIsInitialized(occaMemory memory) {
   return occa::c::memory(memory).isInitialized();
 }
 
-void* OCCA_RFUNC occaMemoryPtr(occaMemory memory,
-                               occaProperties props) {
-  occa::memory mem = occa::c::memory(memory);
-  if (occa::c::isDefault(props)) {
-    return mem.ptr();
-  }
-  return mem.ptr(occa::c::properties(props));
+void* OCCA_RFUNC occaMemoryPtr(occaMemory memory) {
+  return occa::c::memory(memory).ptr();
 }
 
 occaDevice OCCA_RFUNC occaMemoryGetDevice(occaMemory memory) {

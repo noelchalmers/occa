@@ -317,10 +317,6 @@ namespace occa {
                                  const void *src,
                                  const occa::properties &props) {
 
-      if (props.get("mapped", false)) {
-        return mappedAlloc(bytes, src, props);
-      }
-
       cl_int error;
 
       opencl::memory *mem = new opencl::memory(this, bytes, props);
@@ -344,7 +340,7 @@ namespace occa {
       return mem;
     }
 
-    modeMemory_t* device::mappedAlloc(const udim_t bytes,
+    modeMemory_t* device::hostMalloc(const udim_t bytes,
                                       const void *src,
                                       const occa::properties &props) {
 
@@ -366,13 +362,15 @@ namespace occa {
       }
 
       // Map memory to read/write
-      mem->mappedPtr = clEnqueueMapBuffer(getCommandQueue(),
-                                          mem->clMem,
-                                          CL_TRUE,
-                                          CL_MAP_READ | CL_MAP_WRITE,
-                                          0, bytes,
-                                          0, NULL, NULL,
-                                          &error);
+      mem->ptr = (char*) clEnqueueMapBuffer(getCommandQueue(),
+                                    mem->clMem,
+                                    CL_TRUE,
+                                    CL_MAP_READ | CL_MAP_WRITE,
+                                    0, bytes,
+                                    0, NULL, NULL,
+                                    &error);
+
+      mem->useHostPtr = true;
 
       OCCA_OPENCL_ERROR("Device: clEnqueueMapBuffer", error);
 

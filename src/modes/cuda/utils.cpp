@@ -231,7 +231,7 @@ namespace occa {
       mem.dontUseRefs();
 
       mem.ptr = (char*) ptr;
-      mem.mappedPtr = NULL;
+      mem.useHostPtr = true;
       mem.isUnified = props.get("unified", false);
 
       return occa::memory(&mem);

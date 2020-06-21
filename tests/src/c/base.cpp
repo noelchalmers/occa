@@ -77,6 +77,21 @@ void testMemoryMethods() {
             bytes);
   occaFree(&mem);
 
+  // hostMalloc
+  mem = occaHostMalloc(bytes,
+                       NULL,
+                       occaDefault);
+  ASSERT_EQ(occaMemorySize(mem),
+            bytes);
+  occaFree(&mem);
+
+  mem = occaHostMalloc(bytes,
+                       NULL,
+                       props);
+  ASSERT_EQ(occaMemorySize(mem),
+            bytes);
+  occaFree(&mem);
+
   // umalloc
   void *ptr = occaUMalloc(bytes,
                           NULL,

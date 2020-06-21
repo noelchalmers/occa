@@ -8,8 +8,7 @@ OCCA_START_EXTERN_C
 
 OCCA_LFUNC bool OCCA_RFUNC occaMemoryIsInitialized(occaMemory memory);
 
-OCCA_LFUNC void* OCCA_RFUNC occaMemoryPtr(occaMemory memory,
-                                          occaProperties props);
+OCCA_LFUNC void* OCCA_RFUNC occaMemoryPtr(occaMemory memory);
 
 OCCA_LFUNC occaDevice OCCA_RFUNC occaMemoryGetDevice(occaMemory memory);
 

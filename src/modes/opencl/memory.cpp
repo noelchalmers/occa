@@ -10,17 +10,16 @@ namespace occa {
                    const occa::properties &properties_) :
         occa::modeMemory_t(modeDevice_, size_, properties_),
         rootClMem(&clMem),
-        rootOffset(0),
-        mappedPtr(NULL) {}
+        rootOffset(0) {}
 
     memory::~memory() {
       if (isOrigin) {
         // Free mapped-host pointer
-        if (mappedPtr) {
+        if (useHostPtr) {
           OCCA_OPENCL_ERROR("Mapped Free: clEnqueueUnmapMemObject",
                             clEnqueueUnmapMemObject(getCommandQueue(),
                                                     clMem,
-                                                    mappedPtr,
+                                                    ptr,
                                                     0, NULL, NULL));
         }
       }
@@ -35,7 +34,7 @@ namespace occa {
       rootOffset = 0;
 
       clMem = NULL;
-      mappedPtr = NULL;
+      ptr = nullptr;
       size = 0;
     }
 
@@ -74,13 +73,14 @@ namespace occa {
                                    &error);
 
       OCCA_OPENCL_ERROR("Device: clCreateSubBuffer", error);
+
+      if (useHostPtr) {
+        m->ptr = ptr + offset;
+      }
       return m;
     }
 
-    void* memory::getPtr(const occa::properties &props) {
-      if (props.get("mapped", false)) {
-        return mappedPtr;
-      }
+    void* memory::getPtr() {
       return ptr;
     }
 

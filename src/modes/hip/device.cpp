@@ -401,10 +401,6 @@ namespace occa {
                                  const void *src,
                                  const occa::properties &props) {
 
-      if (props.get("mapped", false)) {
-        return mappedAlloc(bytes, src, props);
-      }
-
       hip::memory &mem = *(new hip::memory(this, bytes, props));
 
       OCCA_HIP_ERROR("Device: Setting Device",
@@ -419,7 +415,7 @@ namespace occa {
       return &mem;
     }
 
-    modeMemory_t* device::mappedAlloc(const udim_t bytes,
+    modeMemory_t* device::hostMalloc(const udim_t bytes,
                                       const void *src,
                                       const occa::properties &props) {
 
@@ -428,15 +424,18 @@ namespace occa {
       OCCA_HIP_ERROR("Device: Setting Device",
                      hipSetDevice(deviceID));
       OCCA_HIP_ERROR("Device: malloc host",
-                     hipHostMalloc((void**) &(mem.mappedPtr), bytes));
+                     hipHostMalloc((void**) &(mem.ptr), bytes));
       OCCA_HIP_ERROR("Device: get device pointer from host",
                      hipHostGetDevicePointer((void**) &(mem.hipPtr),
-                                             mem.mappedPtr,
+                                             mem.ptr,
                                              0));
 
       if (src != NULL) {
-        ::memcpy(mem.mappedPtr, src, bytes);
+        ::memcpy(mem.ptr, src, bytes);
       }
+
+      mem.useHostPtr = true;
+
       return &mem;
     }
 

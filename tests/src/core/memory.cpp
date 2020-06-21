@@ -29,6 +29,13 @@ void testMalloc() {
   ASSERT_EQ(mem.ptr<int>()[0], value);
   ASSERT_EQ(mem.ptr<int>(), hostPtr);
 
+  mem = occa::hostMalloc(bytes);
+  ASSERT_NEQ(mem.ptr(), (void*) NULL);
+
+  mem = occa::hostMalloc(bytes, hostPtr);
+  ASSERT_EQ(((int*) mem.ptr())[0], value);
+  ASSERT_NEQ(mem.ptr<int>(), hostPtr);
+
   occa::setDevice(
     "mode: 'Serial',"
     "memory: {"

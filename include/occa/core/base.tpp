@@ -7,6 +7,13 @@ namespace occa {
   }
 
   template <class TM>
+  occa::memory hostMalloc(const dim_t entries,
+                      const void *src,
+                      const occa::properties &props) {
+    return hostMalloc(entries, dtype::get<TM>(), src, props);
+  }
+
+  template <class TM>
   TM* umalloc(const dim_t entries,
               const void *src,
               const occa::properties &props) {

@@ -33,6 +33,7 @@ namespace occa {
                              size - offset,
                              properties);
       m->ptr = ptr + offset;
+      m->useHostPtr = useHostPtr;
       return m;
     }
 

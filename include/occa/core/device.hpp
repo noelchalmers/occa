@@ -131,6 +131,10 @@ namespace occa {
                                  const void* src,
                                  const occa::properties &props) = 0;
 
+    virtual modeMemory_t* hostMalloc(const udim_t bytes,
+                                 const void* src,
+                                 const occa::properties &props) = 0;
+
     virtual udim_t memorySize() const = 0;
     //  |===============================
     //==================================
@@ -260,6 +264,34 @@ namespace occa {
     occa::memory malloc(const dim_t bytes,
                         const occa::properties &props);
 
+    occa::memory hostMalloc(const dim_t entries,
+                        const dtype_t &dtype,
+                        const void *src = NULL,
+                        const occa::properties &props = occa::properties());
+
+    occa::memory hostMalloc(const dim_t entries,
+                        const dtype_t &dtype,
+                        const occa::memory src,
+                        const occa::properties &props = occa::properties());
+
+    occa::memory hostMalloc(const dim_t entries,
+                        const dtype_t &dtype,
+                        const occa::properties &props);
+
+    template <class TM = void>
+    occa::memory hostMalloc(const dim_t bytes,
+                        const void *src = NULL,
+                        const occa::properties &props = occa::properties());
+
+    template <class TM = void>
+    occa::memory hostMalloc(const dim_t bytes,
+                        const occa::memory src,
+                        const occa::properties &props = occa::properties());
+
+    template <class TM = void>
+    occa::memory hostMalloc(const dim_t bytes,
+                        const occa::properties &props);
+
     void* umalloc(const dim_t entries,
                   const dtype_t &dtype,
                   const void *src = NULL,
@@ -308,6 +340,20 @@ namespace occa {
 
   template <>
   occa::memory device::malloc<void>(const dim_t entries,
+                                    const occa::properties &props);
+
+  template <>
+  occa::memory device::hostMalloc<void>(const dim_t entries,
+                                    const void *src,
+                                    const occa::properties &props);
+
+  template <>
+  occa::memory device::hostMalloc<void>(const dim_t entries,
+                                    const occa::memory src,
+                                    const occa::properties &props);
+
+  template <>
+  occa::memory device::hostMalloc<void>(const dim_t entries,
                                     const occa::properties &props);
   //====================================
 

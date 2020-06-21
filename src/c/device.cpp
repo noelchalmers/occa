@@ -224,6 +224,46 @@ occaMemory OCCA_RFUNC occaDeviceTypedMalloc(occaDevice device,
   return occa::c::newOccaType(memory);
 }
 
+occaMemory OCCA_RFUNC occaDeviceHostMalloc(occaDevice device,
+                                       const occaUDim_t bytes,
+                                       const void *src,
+                                       occaProperties props) {
+  occa::device device_ = occa::c::device(device);
+  occa::memory memory;
+  if (occa::c::isDefault(props)) {
+    memory = device_.hostMalloc(bytes, src);
+  } else {
+    memory = device_.hostMalloc(bytes,
+                            src,
+                            occa::c::properties(props));
+  }
+  memory.dontUseRefs();
+
+  return occa::c::newOccaType(memory);
+}
+
+occaMemory OCCA_RFUNC occaDeviceTypedHostMalloc(occaDevice device,
+                                            const occaUDim_t entries,
+                                            const occaDtype dtype,
+                                            const void *src,
+                                            occaProperties props) {
+  occa::device device_ = occa::c::device(device);
+  const occa::dtype_t &dtype_ = occa::c::dtype(dtype);
+
+  occa::memory memory;
+  if (occa::c::isDefault(props)) {
+    memory = device_.hostMalloc(entries, dtype_, src);
+  } else {
+    memory = device_.hostMalloc(entries,
+                            dtype_,
+                            src,
+                            occa::c::properties(props));
+  }
+  memory.dontUseRefs();
+
+  return occa::c::newOccaType(memory);
+}
+
 void* OCCA_RFUNC occaDeviceUMalloc(occaDevice device,
                                    const occaUDim_t bytes,
                                    const void *src,

@@ -75,6 +75,21 @@ namespace occa {
                             const void *src,
                             const occa::properties &props);
 
+  occa::memory hostMalloc(const dim_t entries,
+                      const dtype_t &dtype,
+                      const void *src = NULL,
+                      const occa::properties &props = occa::properties());
+
+  template <class TM = void>
+  occa::memory hostMalloc(const dim_t entries,
+                      const void *src = NULL,
+                      const occa::properties &props = occa::properties());
+
+  template <>
+  occa::memory hostMalloc<void>(const dim_t entries,
+                            const void *src,
+                            const occa::properties &props);
+
   void* umalloc(const dim_t entries,
                 const dtype_t &dtype,
                 const void *src = NULL,

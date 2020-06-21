@@ -617,6 +617,68 @@ namespace occa {
     return malloc(entries, dtype::byte, NULL, props);
   }
 
+  occa::memory device::hostMalloc(const dim_t entries,
+                              const dtype_t &dtype,
+                              const void *src,
+                              const occa::properties &props) {
+    assertInitialized();
+
+    if (entries == 0) {
+      return memory();
+    }
+
+    const dim_t bytes = entries * dtype.bytes();
+    OCCA_ERROR("Trying to allocate "
+               << "negative bytes (" << bytes << ")",
+               bytes >= 0);
+
+    occa::properties memProps = memoryProperties(props);
+
+    memory mem(modeDevice->hostMalloc(bytes, src, memProps));
+    mem.setDtype(dtype);
+
+    modeDevice->bytesAllocated += bytes;
+
+    return mem;
+  }
+
+  occa::memory device::hostMalloc(const dim_t entries,
+                              const dtype_t &dtype,
+                              const occa::memory src,
+                              const occa::properties &props) {
+    memory mem = hostMalloc(entries, dtype, NULL, props);
+    if (entries && src.size()) {
+      mem.copyFrom(src);
+    }
+    return mem;
+  }
+
+  occa::memory device::hostMalloc(const dim_t entries,
+                              const dtype_t &dtype,
+                              const occa::properties &props) {
+    return hostMalloc(entries, dtype, NULL, props);
+  }
+
+  template <>
+  memory device::hostMalloc<void>(const dim_t entries,
+                              const void *src,
+                              const occa::properties &props) {
+    return hostMalloc(entries, dtype::byte, src, props);
+  }
+
+  template <>
+  memory device::hostMalloc<void>(const dim_t entries,
+                              const occa::memory src,
+                              const occa::properties &props) {
+    return hostMalloc(entries, dtype::byte, src, props);
+  }
+
+  template <>
+  memory device::hostMalloc<void>(const dim_t entries,
+                              const occa::properties &props) {
+    return hostMalloc(entries, dtype::byte, NULL, props);
+  }
+
   void* device::umalloc(const dim_t entries,
                         const dtype_t &dtype,
                         const void *src,

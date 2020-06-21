@@ -154,6 +154,8 @@ void testRun() {
   int value = 1;
   occa::memory mem = occa::malloc<int>(1, &value);
 
+  occa::memory mem2 = occa::hostMalloc<int>(1, &value);
+
   value = 2;
   int *uvaPtr = occa::umalloc<int>(1, &value);
 
@@ -163,6 +165,7 @@ void testRun() {
   argKernel(
     occa::null,
     mem,
+    mem2,
     uvaPtr,
     (int8_t) 3,
     (uint8_t) 4,

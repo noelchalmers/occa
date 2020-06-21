@@ -434,6 +434,14 @@ namespace occa {
       return mem;
     }
 
+    modeMemory_t* device::hostMalloc(const udim_t bytes,
+                                 const void *src,
+                                 const occa::properties &props) {
+      modeMemory_t *mem = malloc(bytes, src, props);
+      mem->useHostPtr = true;
+      return mem;
+    }
+
     udim_t device::memorySize() const {
       return sys::installedRAM();
     }

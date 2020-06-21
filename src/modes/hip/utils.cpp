@@ -203,7 +203,7 @@ namespace occa {
       mem.dontUseRefs();
 
       mem.ptr = (char*) ptr;
-      mem.mappedPtr = NULL;
+      mem.useHostPtr = true;
 
       return occa::memory(&mem);
     }
